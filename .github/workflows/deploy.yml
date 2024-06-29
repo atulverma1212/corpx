@@ -84,6 +84,9 @@ jobs:
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
