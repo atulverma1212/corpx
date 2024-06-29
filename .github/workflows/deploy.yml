@@ -2,6 +2,7 @@ name: deployment_workflow
 
 env:
   URL_CHECKER_TIMEOUT: 60  # Reasonable timeout value in seconds
+  PATH_PREFIX: "/${{ github.event.repository.name }}/"  # Format PATH_PREFIX
 
 on:
   push:
@@ -61,14 +62,55 @@ jobs:
 
       - name: Run scripts in script/ folder
         run: |
+          set -e
           for script in script/*.js; do
             if [ -f "$script" ] && [ -x "$script" ]; then
               echo "Running $script"
-              "$script" || exit 1
+              node "$script"
             fi
           done
-
-      - name: Run URL checker
-        run: node script/url-checker.js
         env:
           URL_CHECKER_TIMEOUT: ${{ env.URL_CHECKER_TIMEOUT }}
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify test job success
+        run: echo "Test job succeeded."
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5.0.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Set PATH_PREFIX for Eleventy
+        run: |
+          echo "PATH_PREFIX=${{ env.PATH_PREFIX }}"
+          echo "PATH_PREFIX=${{ env.PATH_PREFIX }}" >> $GITHUB_ENV
+
+      - name: Build static pages with Eleventy (Production)
+        run: npm run eleventy:prod
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: _site
