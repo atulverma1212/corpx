@@ -110,10 +110,42 @@ jobs:
           echo "PATH_PREFIX=${{ env.PATH_PREFIX }}" >> $GITHUB_ENV
 
       - name: Build static pages with Eleventy (Production)
-        run: npm run eleventy:prod
+        run: npm run prod
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: site
           path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Verify build job success
+        run: echo "Build job succeeded."
+
+      - name: Download built site
+        uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git init
+          git add .
+          git commit -m "Deployed: ${{ github.sha }}"
+          git push --force --quiet "https://${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:gh-pages
+
+      - name: Create deployment status issue
+        run: |
+          DATE=$(date +"%Y-%m-%d")
+          STATUS="succeeded"
+          BODY="URL: https://docs.github.com/en/rest/reference/pages#get-a-apiname-pages-site"
+          gh issue create --title "$DATE - Deployment: $STATUS" --body "$BODY" --label "deployment"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
