@@ -118,7 +118,7 @@ jobs:
         run: npm run prod
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-pages-artifact@v3.0.1
         with:
           name: site
           path: _site
