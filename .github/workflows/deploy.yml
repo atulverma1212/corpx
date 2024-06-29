@@ -139,6 +139,8 @@ jobs:
 
       - name: Deploy 🚀
         uses: actions/deploy-pages@v4
+        environment:
+          name: github-pages
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           artifact_name: site
