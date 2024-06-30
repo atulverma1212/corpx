@@ -145,6 +145,10 @@ jobs:
           artifact_name: site
 
 
+#      - uses: actions/checkout@v4
+#      - name: get-date
+#        id: get_date
+#        run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
       - uses: actions/checkout@v4
       - name: create an issue
@@ -152,33 +156,35 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           title: |
-            DATE=$(date +"%Y-%m-%d")
-            $DATE - Deployment Succeeded
+            ${{ env.DATE }} - Deployment Succeeded
           body: |
-            BODY="URL: https://atulverma1212.github.io/corpx/"
+            URL: https://atulverma1212.github.io/corpx/
 
-      - name: Create deployment status issue
-        run: |
-          DATE=$(date +"%Y-%m-%d")
-          STATUS="succeeded"
-          BODY="URL: https://docs.github.com/en/rest/reference/pages#get-a-apiname-pages-site"
-          gh issue create --title "$DATE - Deployment: $STATUS" --body "$BODY" --label "deployment"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v4
+      - name: create an issue
+        run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+        uses: dacbd/create-issue-action@v2.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: |
+            ${{ env.DATE }} - Deployment Succeeded
+          body: |
+            URL: https://atulverma1212.github.io/corpx/
 
-#  create-issue-if-job-fails:
-#    needs: build
-#    runs-on: ubuntu-latest
-#    if: failure()
-#    steps:
-#      - name: Checkout Code
-#        uses: actions/checkout@v4
-#
-#      - name: Create Issue
-#        uses: dacbd/create-issue-action@v2.0.0
-#        with:
-#          token: ${{ github.token }}
-#          title: |
-#            [${{ github.workflow }}] failed during [${{ github.event_name }}]
-#          body: |
+  create-issue-if-job-fails:
+    needs: build
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Create Issue
+        uses: dacbd/create-issue-action@v2.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: |
+            ${{ env.DATE }} - Deployment Failure
+          body: |
+            [${{ github.workflow }}] failed during [${{ github.event_name }}]
 
