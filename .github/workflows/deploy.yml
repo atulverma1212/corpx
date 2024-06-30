@@ -169,4 +169,5 @@ jobs:
             gh issue create --title "${DATE} - Deployment Succeeded" --body "URL: $REPO_URL\nDeployment succeeded."
           else
             gh issue create --title "${DATE} - Deployment Failed" --body "URL: $REPO_URL\nDeployment failed."
+          fi
 
