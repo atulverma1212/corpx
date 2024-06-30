@@ -17,9 +17,8 @@ on:
   workflow_dispatch:
 
 permissions:
-#  contents: read
   pages: write
-#  id-token: write
+  id-token: write # actions/deploy-pages@v4 needs this
   issues: write
 
 jobs:
@@ -156,10 +155,17 @@ jobs:
 
       - uses: actions/checkout@v4
       - name: create an issue
-        uses: dacbd/create-issue-action@v2.0.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          title: ${{ env.ISSUE_TITLE }}
-          body: |
-            URL: https://${{ github.actor }}.github.io/${{ github.repository }}
+        run: |
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+          sudo apt-add-repository https://cli.github.com/packages
+          sudo apt update
+          sudo apt install gh
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+
+          DATE=$(date +"%Y-%m-%d")
+          REPO_URL="https://${{ github.actor }}.github.io/${{ github.repository }}"
+          if [ "${{ job.status }}" == "success" ]; then
+            gh issue create --title "${DATE} - Deployment Succeeded" --body "URL: $REPO_URL\nDeployment succeeded."
+          else
+            gh issue create --title "${DATE} - Deployment Failed" --body "URL: $REPO_URL\nDeployment failed."
 
