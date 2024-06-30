@@ -148,40 +148,22 @@ jobs:
         id: get_date
         run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
-      - uses: actions/checkout@v4
-      - name: create an issue
-        uses: dacbd/create-issue-action@v2.0.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          title: |
-            ${{ env.DATE }} - Deployment Succeeded
-          body: |
-            URL: https://atulverma1212.github.io/corpx/
+      - name: Determine Deployment Status
+        id: deployment_status
+        run: |
+          REPO_URL="https://${{ github.actor }}.github.io/${{ github.repository }}"
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "ISSUE_TITLE=${{ env.DATE }} - Deployment Succeeded" >> $GITHUB_ENV
+          else
+            echo "ISSUE_TITLE=${{ env.DATE }} - Deployment Failed" >> $GITHUB_ENV
+          fi
 
       - uses: actions/checkout@v4
       - name: create an issue
         uses: dacbd/create-issue-action@v2.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          title: |
-            ${{ env.DATE }} - Deployment Succeeded
+          title: ${{ env.ISSUE_TITLE }}
           body: |
-            URL: https://atulverma1212.github.io/corpx/
-
-  create-issue-if-job-fails:
-    needs: build
-    runs-on: ubuntu-latest
-    if: failure()
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Create Issue
-        uses: dacbd/create-issue-action@v2.0.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          title: |
-            ${{ env.DATE }} - Deployment Failure
-          body: |
-            [${{ github.workflow }}] failed during [${{ github.event_name }}]
+            URL: https://${{ github.actor }}.github.io/${{ github.repository }}
 
