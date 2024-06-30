@@ -158,8 +158,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
-
           DATE=$(date +"%Y-%m-%d")
           REPO_URL="https://${{ github.actor }}.github.io/${{ github.repository }}"
           if [ "${{ job.status }}" == "success" ]; then
