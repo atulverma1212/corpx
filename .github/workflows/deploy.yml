@@ -164,7 +164,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           DATE=$(date +"%Y-%m-%d")
-          REPO_URL="https://${{ github.actor }}.github.io/${{ github.repository }}"
+          REPO_URL="https://${{ github.actor }}.github.io/${{ github.repository }}/"
           if [ "${{ job.status }}" == "success" ]; then
             gh issue create --title "${DATE} - Deployment Succeeded" --body "URL: $REPO_URL"
           else
