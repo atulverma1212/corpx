@@ -153,6 +153,11 @@ jobs:
             echo "ISSUE_TITLE=${{ env.DATE }} - Deployment Failed" >> $GITHUB_ENV
           fi
 
+      - name: Set up GitHub CLI
+        uses: actions/setup-python@v5.1.0
+        with:
+          python-version: '3.x'
+
       - uses: actions/checkout@v4
       - name: create an issue
         env:
