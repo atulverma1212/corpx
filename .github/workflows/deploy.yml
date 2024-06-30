@@ -166,8 +166,8 @@ jobs:
           DATE=$(date +"%Y-%m-%d")
           REPO_URL="https://${{ github.actor }}.github.io/${{ github.repository }}"
           if [ "${{ job.status }}" == "success" ]; then
-            gh issue create --title "${DATE} - Deployment Succeeded" --body "URL: $REPO_URL\nDeployment succeeded."
+            gh issue create --title "${DATE} - Deployment Succeeded" --body "URL: $REPO_URL"
           else
-            gh issue create --title "${DATE} - Deployment Failed" --body "URL: $REPO_URL\nDeployment failed."
+            gh issue create --title "${DATE} - Deployment Failed" --body "URL: $REPO_URL"
           fi
 
