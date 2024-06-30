@@ -144,6 +144,18 @@ jobs:
           artifact_name: site
 
 
+
+      - uses: actions/checkout@v4
+      - name: create an issue
+        uses: dacbd/create-issue-action@v2.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: |
+            DATE=$(date +"%Y-%m-%d")
+            $DATE - Deployment Succeeded
+          body: |
+            BODY="URL: https://atulverma1212.github.io/corpx/"
+
       - name: Create deployment status issue
         run: |
           DATE=$(date +"%Y-%m-%d")
@@ -152,3 +164,20 @@ jobs:
           gh issue create --title "$DATE - Deployment: $STATUS" --body "$BODY" --label "deployment"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+#  create-issue-if-job-fails:
+#    needs: build
+#    runs-on: ubuntu-latest
+#    if: failure()
+#    steps:
+#      - name: Checkout Code
+#        uses: actions/checkout@v4
+#
+#      - name: Create Issue
+#        uses: dacbd/create-issue-action@v2.0.0
+#        with:
+#          token: ${{ github.token }}
+#          title: |
+#            [${{ github.workflow }}] failed during [${{ github.event_name }}]
+#          body: |
+
