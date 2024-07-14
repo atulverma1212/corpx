@@ -1,4 +1,4 @@
-name: deployment_workflow
+name: corpx_deployment_workflow
 
 on:
   push:
@@ -21,24 +21,16 @@ permissions:
   id-token: write # actions/deploy-pages@v4 needs this
   issues: write
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
-  cancel-previous-runs:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.12.0
-        with:
-          access_token: ${{ secrets.GITHUB_TOKEN }}
-          all_but_latest: true
 
   test:
-    needs: cancel-previous-runs
     runs-on: ubuntu-latest
     env:
       URL_CHECKER_TIMEOUT: ${{ vars.URL_CHECKER_TIMEOUT }}
-    concurrency:
-      group: deployment_workflow
-      cancel-in-progress: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
